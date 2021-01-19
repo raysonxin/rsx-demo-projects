@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class GreetingRpc {
 
-    @DubboReference(version = "1.0.0")
+    @DubboReference(version = "1.0.0",check = false)
     private GreetingService greetingService;
 
     public String sayHello(String name, String hometown, String greeting) {

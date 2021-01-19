@@ -1,28 +1,30 @@
 package com.rsxtech.demo.consumer.controller;
 
-import com.rsxtech.demo.consumer.rpc.GreetingRpc;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
+import com.rsxtech.common.dto.SingleResponse;
+import com.rsxtech.demo.consumer.controller.dto.clientobject.HelloResponseCO;
+import com.rsxtech.demo.consumer.controller.dto.command.HelloRequestCmd;
+import com.rsxtech.demo.consumer.transfer.EnableTransfer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
 /**
- * TODO
+ * 旧服务实现
  *
  * @author raysonxin
  * @since 2021/1/17
  */
 @RestController
 @RequestMapping(value = "/greeting")
+@Slf4j
+@EnableTransfer
 public class GreetingController {
 
-    @Resource
-    private GreetingRpc greetingRpc;
-
-    @RequestMapping(value = "hello/{name}/{hometown}/{greeting}")
-    public String sayHello(@PathVariable("name") String name, @PathVariable("hometown") String hometown, @PathVariable("greeting") String greeting) {
-        return greetingRpc.sayHello(name, hometown, greeting);
+    @RequestMapping(value = "hello", method = RequestMethod.POST)
+    public SingleResponse<HelloResponseCO> sayHello(@RequestBody HelloRequestCmd helloRequestCmd) {
+        log.info("sayHello params={}", helloRequestCmd);
+        HelloResponseCO responseCO = new HelloResponseCO();
+        responseCO.setName("abcd");
+        responseCO.setGreeting("Hello," + helloRequestCmd.getName() + ". --from old service.");
+        return SingleResponse.of(responseCO);
     }
 }
