@@ -82,7 +82,7 @@ public class TransferAspect {
             Object[] targetParams = new Object[args.length];
             for (int i = 0; i < args.length; i++) {
                 // 在这里进行参数转换
-                targetParams[i] = new Object();
+                targetParams[i] = ObjectConverter.convert(args[i],targetParamTypes[i]);
             }
 
             result = targetMethod.invoke(bean, targetParams);
@@ -91,7 +91,6 @@ public class TransferAspect {
         }
 
         // 返回前，需要根据returnType进行类型转换
-
-        return result;
+        return ObjectConverter.convert(result,returnType);
     }
 }
