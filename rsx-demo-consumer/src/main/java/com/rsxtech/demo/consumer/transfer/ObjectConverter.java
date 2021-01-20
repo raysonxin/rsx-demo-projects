@@ -6,10 +6,14 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class ObjectConverter {
 
     private static final Map<String, Method> converters = new HashMap<>();
 
+    private static ObjectMapper objectMapper = new ObjectMapper();
+    
     static {
         Method[] methods = ObjectConverter.class.getDeclaredMethods();
         for (Method method: methods) {
@@ -35,8 +39,14 @@ public class ObjectConverter {
         Method converter = converters.get(converterName);
 
         if (converter == null) {
-            String message = String.format("Can't convert from `%s` to `%s`. Not found satisfied conversion method.", fromType, toType);
-            throw new UnsupportedOperationException(message);
+            // 考虑两者都是复杂类型，通过序列化、反序列化方式实现转换。
+            try {
+                String json = objectMapper.writeValueAsString(from);
+                return objectMapper.readValue(json, toClass);
+            } catch (Exception e) {
+                String message = String.format("Can't convert from `%s` to `%s`. Not found satisfied conversion method.", fromType, toType);
+                throw new UnsupportedOperationException(message, e);
+            }
         }
 
         try {
