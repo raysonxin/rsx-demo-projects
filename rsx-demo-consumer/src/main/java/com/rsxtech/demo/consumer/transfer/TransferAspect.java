@@ -42,8 +42,9 @@ public class TransferAspect {
                 return this.invokeProxy(className, methodName, args, returnType);
             }
         } catch (Exception ex) {
-            return joinPoint.proceed();
+            log.error("TransferAspect execute {}#{} transfer failed",className,methodName,ex);
         }
+        // 如果无灰度或者遇到异常了，还是使用旧的处理方式，新接口不行，还得保证系统可用。
         return joinPoint.proceed();
     }
 
