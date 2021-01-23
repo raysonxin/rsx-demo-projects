@@ -53,7 +53,7 @@ public class TransferAspect {
      */
     private boolean needTransfer(Object[] args) {
         int rand = new Random().nextInt(100) % 2;
-        return rand == 0;
+        return true;
     }
 
     private Object invokeProxy(String className, String methodName, Object[] args, Class<?> returnType) throws Exception {

@@ -13,10 +13,10 @@ public class ObjectConverter {
     private static final Map<String, Method> converters = new HashMap<>();
 
     private static ObjectMapper objectMapper = new ObjectMapper();
-    
+
     static {
         Method[] methods = ObjectConverter.class.getDeclaredMethods();
-        for (Method method: methods) {
+        for (Method method : methods) {
             if (method.getName().startsWith("convertFrom")) {
                 converters.put(method.getName(), method);
             }
@@ -41,6 +41,9 @@ public class ObjectConverter {
         if (converter == null) {
             // 考虑两者都是复杂类型，通过序列化、反序列化方式实现转换。
             try {
+                fromType = from.getClass().getName();
+                toType = toClass.getName();
+
                 String json = objectMapper.writeValueAsString(from);
                 return objectMapper.readValue(json, toClass);
             } catch (Exception e) {
@@ -174,7 +177,7 @@ public class ObjectConverter {
     private static BigDecimal convertFromFloatToBigDecimal(Float value) {
         return BigDecimal.valueOf(value);
     }
-    
+
     // From Double
 
     private static String convertFromDoubleToString(Double value) {
@@ -294,5 +297,5 @@ public class ObjectConverter {
     private static BigInteger convertFromBigDecimalToBigInteger(BigDecimal value) {
         return value.toBigInteger();
     }
-    
+
 }
