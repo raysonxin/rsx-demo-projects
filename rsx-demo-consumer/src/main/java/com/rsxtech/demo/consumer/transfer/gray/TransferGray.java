@@ -25,14 +25,15 @@ import java.util.concurrent.Executor;
 @Slf4j
 public class TransferGray {
 
-
     @Value("${nacos.server-addr}")
     private String nacosServer;
-
 
     private static final String dataId = "com.rsxtech.demo.consumer:gray-rule.json";
     private static final String group = "DEFAULT_GROUP";
 
+    /**
+     * 配置内容
+     */
     public static PercentGrayModel grayConfig;
 
     @PostConstruct
@@ -41,6 +42,8 @@ public class TransferGray {
         properties.put("serverAddr", nacosServer);
 
         ConfigService configService = NacosFactory.createConfigService(properties);
+
+        // 启动后，主动拉取配置。
         String content = configService.getConfig(dataId, group, 5000);
         log.info("TransferGrayConfig get config={}", content);
         if (ObjectUtils.isEmpty(content)) {
@@ -50,6 +53,7 @@ public class TransferGray {
         ObjectMapper objectMapper = new ObjectMapper();
         grayConfig = objectMapper.readValue(content, PercentGrayModel.class);
 
+        // 当Nacos中配置变更时，可接收新的内容。
         configService.addListener(dataId, group, new Listener() {
             @Override
             public Executor getExecutor() {
