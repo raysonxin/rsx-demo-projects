@@ -18,14 +18,14 @@ public class HelloRequestCmd implements Serializable {
     private static final long serialVersionID = 1L;
 
     /**
+     * 用户id
+     */
+    private Long userId;
+
+    /**
      * 姓名
      */
     private String name;
-
-    /**
-     * 家乡
-     */
-    private String hometown;
 
     /**
      * 问候语

@@ -22,7 +22,7 @@ public class GreetingServiceImpl implements GreetingService {
         log.info("sayHello request:{}", helloRequestCmd);
         HelloResponseCO responseCO = new HelloResponseCO();
         responseCO.setName("abcd");
-        responseCO.setGreeting("Good morning!");
+        responseCO.setGreeting("Good morning! --from new service");
         return SingleResponse.of(responseCO);
     }
 }

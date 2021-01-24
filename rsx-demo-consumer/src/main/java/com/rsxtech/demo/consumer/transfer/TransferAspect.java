@@ -1,5 +1,8 @@
 package com.rsxtech.demo.consumer.transfer;
 
+import com.rsxtech.demo.consumer.controller.dto.command.HelloRequestCmd;
+import com.rsxtech.demo.consumer.transfer.gray.PercentGrayModel;
+import com.rsxtech.demo.consumer.transfer.gray.TransferGray;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -9,7 +12,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.Random;
 
 /**
  * 切面实现
@@ -42,18 +44,23 @@ public class TransferAspect {
                 return this.invokeProxy(className, methodName, args, returnType);
             }
         } catch (Exception ex) {
-            log.error("TransferAspect execute {}#{} transfer failed",className,methodName,ex);
+            log.error("TransferAspect execute {}#{} transfer failed", className, methodName, ex);
         }
         // 如果无灰度或者遇到异常了，还是使用旧的处理方式，新接口不行，还得保证系统可用。
         return joinPoint.proceed();
     }
 
     /**
-     * 模拟灰度逻辑
+     * 灰度判断逻辑
+     *
+     * @return true-命中灰度，执行转发；false-不转发
      */
     private boolean needTransfer(Object[] args) {
-        int rand = new Random().nextInt(100) % 2;
-        return true;
+        // 这里先简单处理，实际情况下需要根据参数特点，编写一个方法解析灰度参数。
+        // 比如我们的老系统，所有接口都包含一个用户请求对象，就可以找个找个参数，然后执行灰度判断。
+        HelloRequestCmd cmd = (HelloRequestCmd) args[0];
+        PercentGrayModel percentGrayModel = TransferGray.grayConfig;
+        return percentGrayModel.hitGray(cmd.getUserId());
     }
 
     private Object invokeProxy(String className, String methodName, Object[] args, Class<?> returnType) throws Exception {
@@ -83,7 +90,7 @@ public class TransferAspect {
             Object[] targetParams = new Object[args.length];
             for (int i = 0; i < args.length; i++) {
                 // 在这里进行参数转换
-                targetParams[i] = ObjectConverter.convert(args[i],targetParamTypes[i]);
+                targetParams[i] = ObjectConverter.convert(args[i], targetParamTypes[i]);
             }
 
             result = targetMethod.invoke(bean, targetParams);
@@ -92,6 +99,6 @@ public class TransferAspect {
         }
 
         // 返回前，需要根据returnType进行类型转换
-        return ObjectConverter.convert(result,returnType);
+        return ObjectConverter.convert(result, returnType);
     }
 }
