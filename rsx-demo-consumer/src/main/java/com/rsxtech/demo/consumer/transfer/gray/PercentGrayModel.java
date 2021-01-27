@@ -70,7 +70,4 @@ public class PercentGrayModel {
         // 按照灰度百分比计算是否命中
         return target % 100 < percent;
     }
-
-
-
 }
